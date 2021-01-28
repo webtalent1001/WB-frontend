@@ -11,7 +11,7 @@
     <el-table v-loading="loading" :data="list" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="ID" width="220">
         <template slot-scope="scope">
-          {{ scope.row.id }}
+          {{ scope.row.key }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Role Name" width="220">
@@ -24,7 +24,7 @@
           {{ scope.row.email }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Operations">
+      <el-table-column align="center" width="200px" label="Operations">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope)">Delete</el-button>
@@ -62,13 +62,13 @@
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">Cancel</el-button>
-        <el-button type="primary" @click="confirmRole">Confirm</el-button>
+        <el-button type="primary" @click="handleSubmit">Confirm</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getRoles, getPermissions } from '@/api/role'
+import { getRoles, addRole, updateRole, deleteRole, getPermissions } from '@/api/role'
 import Pagination from '@/components/Pagination'
 const defaultRole = {
   key: '',
@@ -85,7 +85,9 @@ export default {
       }
       setTimeout(() => {
         if (this.role !== null) {
-          this.$refs.form.validateField('name')
+          this.$nextTick(() => {
+            this.$refs['form'].validateField('name')
+          })
         }
         callback()
       }, 1000)
@@ -116,15 +118,18 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'label'
-      }
+      },
+      mode: 'new',
     }
   },
   created() {
     this.getList()
   },
+  mounted() {
+    console.log(this.$refs.form)
+  },
   methods: {
     handlePermissionsCheckChange(data, checked, indeterminate) {
-      console.log(data.id)
       if (checked === indeterminate) {
         this.role.permissions = this.role.permissions.filter(element => element !== data.id)
       } else {
@@ -138,29 +143,74 @@ export default {
       this.role.permissions = []
       this.dialogType = 'new'
       this.dialogVisible = true
+      this.mode = 'new'
+      this.$nextTick(() => {
+        this.$refs.tree.setCheckedKeys(this.role.permissions);
+      })
     },
     handleEdit(scope) {
-      const checkedPermissions = []
-      const role = this.list[scope.row.key]
-      this.role = { ...role }
-      this.dialogType = 'new'
+      this.role = Object.assign({},this.list[scope.row.key - 1])
+      this.role.permissions = [...this.list[scope.row.key - 1].permissions]
+      this.dialogType = 'edit'
       this.dialogVisible = true
+      this.mode = 'edit'
+      this.$nextTick(() => {
+        this.$refs.tree.setCheckedKeys(this.role.permissions);
+      })
     },
     handleDelete({ $index, row }) {
-      // this.$confirm('Confirm to remove the role?', 'Warning', {
-      //   confirmButtonText: 'Confirm',
-      //   cancelButtonText: 'Cancel',
-      //   type: 'warning'
-      // })
-      //   .then(async() => {
-      //     await deleteRole(row.key)
-      //     this.rolesList.splice($index, 1)
-      //     this.$message({
-      //       type: 'success',
-      //       message: 'Delete succed!'
-      //     })
-      //   })
-      //   .catch(err => { console.error(err) })
+      this.$confirm('Confirm to remove the role?', 'Warning', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      })
+        .then(async() => {
+          await deleteRole(row.id)
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: 'Delete successedd!'
+          })
+        })
+        .catch(err => { console.error(err) })
+    },
+    handleSubmit(){
+      this.$nextTick(() => {
+        this.$refs.form.validate((valid) => {
+          if(valid)
+          {
+            this.$confirm('Are You going to save the Role?', 'Are You Sure', {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'info',
+            center: true
+          }).then(() => {
+            const postData = this.role
+            const loading = this.$loading({
+              lock: true,
+              text: 'Loading',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+            })
+            if(this.mode == 'new')
+            {
+              addRole(postData)
+            }
+            else
+            {
+              updateRole(postData.id,postData)
+            }
+            loading.close()
+            this.$message({
+              type: 'success',
+              message: 'One Role has been saved'
+            })
+            this.dialogVisible = false
+            this.getList()
+          })
+          }
+        })
+      })
     },
     async confirmRole() {
       this.$refs['form'].validate((valid) => {
@@ -173,7 +223,7 @@ export default {
       this.loading = true
       const { data, total } = await getRoles(param)
       data.forEach((element, key) => {
-        element.key = key
+        element.key = key + 1
       })
       this.list = data
       this.permissions = await getPermissions()
