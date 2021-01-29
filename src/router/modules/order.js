@@ -16,37 +16,43 @@ const orderRoutes = {
       path: 'form',
       component: () => import('@/views/orders/form1'),
       name: 'OrderForm',
-      meta: { title: 'WB New PO', icon: 'el-icon-plus', roles: ['manage_order_pending'] }
+      meta: { title: 'WB New PO', icon: 'el-icon-plus', roles: [] }
     },
     {
       path: 'archive0',
       component: () => import('@/views/orders/archive0'),
       name: 'OrderPending',
-      meta: { title: 'WB Pending PO', icon: 'el-icon-folder-opened', roles: ['manage_order_pending'] }
+      meta: { title: 'WB Pending PO', icon: 'el-icon-folder-opened', roles: [] }
     },
     {
       path: 'archive1',
       component: () => import('@/views/orders/archive1'),
       name: 'OrderFulfillment',
-      meta: { title: 'Walnut Fulfillment', icon: 'el-icon-folder-opened', permissions: ['manage_order_pending'] }
+      meta: { title: 'Walnut Fulfillment', icon: 'el-icon-folder-opened', permissions: [] }
     },
     {
       path: 'archive2',
       component: () => import('@/views/orders/archive2'),
       name: 'OrderFulfilled',
-      meta: { title: 'Walnut to Deliver', icon: 'el-icon-folder-opened', permissions: ['manage_order_pending'] }
+      meta: { title: 'Walnut to Deliver', icon: 'el-icon-folder-opened', permissions: [] }
+    },
+    {
+      path: 'archive-scheduled',
+      component: () => import('@/views/orders/archive-scheduled'),
+      name: 'OrderFulfilled',
+      meta: { title: 'Scheduled Deliveries', icon: 'el-icon-folder-opened', permissions: [] }
     },
     {
       path: 'archive4',
       component: () => import('@/views/orders/archive4'),
       name: 'Walnut Delivered',
-      meta: { title: 'Walnut Delivered', icon: 'el-icon-folder-opened', permissions: ['manage_order_pending'] }
+      meta: { title: 'Walnut Delivered', icon: 'el-icon-folder-opened', permissions: [] }
     },
     {
       path: 'archive5',
       component: () => import('@/views/orders/archive5'),
       name: 'Walnut Financial',
-      meta: { title: 'Walnut Financial', icon: 'el-icon-folder-opened', permissions: ['manage_order_pending'] }
+      meta: { title: 'Walnut Financial', icon: 'el-icon-folder-opened', permissions: [] }
     }
   ]
 }

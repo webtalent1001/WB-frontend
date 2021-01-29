@@ -2,13 +2,13 @@
   <div class="app-container">
     <!--Top Bar-->
     <div class="filter-container">
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus">
+      <el-button class="filter-item" @click="handleAdd()" style="margin-left: 10px;" type="primary" icon="el-icon-plus">
         {{ $t('table.add') }}
       </el-button>
     </div>
 
     <!--Table-->
-    <el-table :data="list" style="width: 100%;margin-top:30px;" border>
+    <el-table :data="list" v-loading="loading" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="ID" width="220">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -36,12 +36,40 @@
         </template>
       </el-table-column>
     </el-table>
-
+    <el-dialog title="Add New User" :visible.sync="bDialogFormVisible">
+        <div v-loading="bCreating" class="form-container">
+          <el-form ref="form" :rules="rules" :model="currentRecord" label-position="left" label-width="180px">
+            <el-form-item label="Name" prop="name">
+              <el-input v-model="currentRecord.name" />
+            </el-form-item>
+            <el-form-item label="Email" prop="email">
+              <el-input v-model="currentRecord.email" />
+            </el-form-item>
+            <el-form-item label="password" prop="password">
+              <el-input v-model="currentRecord.password" show-password />
+            </el-form-item>
+            <el-form-item label="Role Name" prop="roleID">
+              <el-select v-model="currentRecord.roleID" class="filter-item" placeholder="Select Role">
+                <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="bDialogFormVisible = false">
+            {{ $t('table.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="createRecord()">
+            {{ $t('table.confirm') }}
+          </el-button>
+        </div>
+        </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getList } from '@/api/user'
+import { getList, getRoles, addUser, updateUser, deleteUser } from '@/api/user'
 import Pagination from '@/components/Pagination'
+const msgFieldRquired = 'This field is required.';
 export default {
   name: 'UserList',
   data() {
@@ -53,46 +81,106 @@ export default {
         keyword: '',
         role: ''
       },
-      loading: false
+      loading: false,
+      bDialogFormVisible: false,
+      bCreating: false,
+      mode: '',
+      currentRecord: {},
+      roles: [],
+      rules: {
+        name: [{ required: true, message: msgFieldRquired, trigger: 'blur' }],
+        email: [
+            { required: true, message: msgFieldRquired, trigger: 'blur' },
+            { type: 'email', message: 'Please input correct email address', trigger: ['blur', 'change'] }
+          ],
+        roleID: [{ required: true, message: msgFieldRquired, trigger: 'blur' }],
+      },
     }
   },
   created() {
     this.getList()
+    this.getRoles()
   },
   methods: {
+    handleAdd(){
+      this.bDialogFormVisible = true
+      this.currentRecord = {}
+      this.mode = 'new'
+    },
     handleEdit(scope) {
-      // this.dialogType = 'edit'
-      // this.dialogVisible = true
-      // this.checkStrictly = true
-      // this.role = deepClone(scope.row)
-      // this.$nextTick(() => {
-      //   const routes = this.generateRoutes(this.role.routes)
-      //   this.$refs.tree.setCheckedNodes(this.generateArr(routes))
-      //   // set checked state of a node not affects its father and child nodes
-      //   this.checkStrictly = false
-      // })
+      this.currentRecord = Object.assign({},this.list[scope.row.key])
+      //this.currentRecord.password = ''
+      this.bDialogFormVisible = true
+      this.mode = 'edit'
+    },
+    createRecord()
+    {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.bCreating = true;
+          const postData = this.currentRecord
+          if(this.mode == 'new')
+          {
+            if(this.currentRecord.password == '')
+            {
+              return false
+            }
+            addUser(postData)
+            this.$message({
+                  message: 'One User has been added.',
+                  type: 'success',
+                  duration: 5 * 1000,
+              });
+          }
+          if(this.mode == 'edit')
+          {
+            updateUser(postData.id, postData)
+            this.$message({
+                message: 'One User has been updated.',
+                type: 'success',
+                duration: 5 * 1000,
+            });
+          }
+          this.getList()
+          this.bCreating = false;
+          this.currentRecord = {}
+          this.bDialogFormVisible = false
+        }
+      })
     },
     handleDelete({ $index, row }) {
-      // this.$confirm('Confirm to remove the role?', 'Warning', {
-      //   confirmButtonText: 'Confirm',
-      //   cancelButtonText: 'Cancel',
-      //   type: 'warning'
-      // })
-      //   .then(async() => {
-      //     await deleteRole(row.key)
-      //     this.rolesList.splice($index, 1)
-      //     this.$message({
-      //       type: 'success',
-      //       message: 'Delete succed!'
-      //     })
-      //   })
-      //   .catch(err => { console.error(err) })
+      this.$confirm('You are about to delete this User', 'Options', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning',
+          center: true
+      }).then(() => {
+          deleteUser(this.list[row.key].id)
+          this.$message({
+              message: 'One User has been deleted.',
+              type: 'success',
+              duration: 5 * 1000,
+          });
+          this.getList()
+      }).catch((e) => {
+          console.log(e)
+      })
     },
     async getList() {
       const { limit, page } = this.query
       this.loading = true
       const { data, total } = await getList()
+      data.forEach((element, key) => {
+        element.key = key
+      })
       this.list = data
+      this.loading = false
+    },
+    async getRoles() {
+      this.loading = true
+      const param = {limit: 100,page: 1}
+      const { data, total } = await getRoles(param)
+      this.roles = data
       this.loading = false
     }
   }

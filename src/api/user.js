@@ -29,3 +29,34 @@ export function getList() {
     method: 'get'
   })
 }
+
+export function getRoles(param) {
+  return request({
+    url: '/roles',
+    method: 'get'
+  })
+}
+
+
+export function addUser(data) {
+  return request({
+    url: '/users',
+    method: 'post',
+    data
+  })
+}
+
+export function updateUser(id, data) {
+  return request({
+    url: `/users/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+export function deleteUser(id) {
+  return request({
+    url: `/users/${id}`,
+    method: 'delete'
+  })
+}

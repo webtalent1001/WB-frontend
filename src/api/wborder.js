@@ -52,6 +52,13 @@ class WBOrderResource extends Resource {
     })
   }
 
+  archiveScheduled(data) {
+    return request({
+      url: '/' + this.uri + '/archive-scheduled',
+      method: 'get',
+      params: data
+    })
+  } 
   archive4(data) {
     return request({
       url: '/' + this.uri + '/archive4',
