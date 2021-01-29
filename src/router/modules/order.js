@@ -16,13 +16,13 @@ const orderRoutes = {
       path: 'form',
       component: () => import('@/views/orders/form1'),
       name: 'OrderForm',
-      meta: { title: 'WB New PO', icon: 'el-icon-plus', roles: [] }
+      meta: { title: 'WB New PO', icon: 'el-icon-plus', permissions: [] }
     },
     {
       path: 'archive0',
       component: () => import('@/views/orders/archive0'),
       name: 'OrderPending',
-      meta: { title: 'WB Pending PO', icon: 'el-icon-folder-opened', roles: [] }
+      meta: { title: 'WB Pending PO', icon: 'el-icon-folder-opened', permissions: [] }
     },
     {
       path: 'archive1',
