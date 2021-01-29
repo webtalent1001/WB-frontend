@@ -9,9 +9,6 @@
       <el-button class="filter-item" type="primary" icon="el-icon-download">
         {{ $t('table.export') }}
       </el-button>
-      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="handleDelete">
-        {{ $t('table.delete') }}
-      </el-button>
     </div>
     <!--Archive-->
     <el-table v-loading="loading" :data="list" row-key="index" border fit highlight-current-row style="width: 100%" @select="handleRowSelection">
@@ -19,10 +16,13 @@
         type="selection"
         width="55"
       />
-      <el-table-column align="center" label="Actions" width="100">
+      <el-table-column align="center" label="Actions" width="200">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEdit(scope.row.key)">
             {{ $t('customer.edit') }}
+          </el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.key)">
+            Delete
           </el-button>
         </template>
       </el-table-column>
@@ -484,24 +484,24 @@ export default {
       this.dialogFormVisible = true
       this.currentCustomerId = customer.client_id
     },
-    handleDelete() {
-      if (this.lCustomersSelected.length === 0) {
-        this.$confirm('You are about to delete selected Customers. Continue?', 'Warning', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          this.$message({
-            type: 'success',
-            message: 'Delete completed'
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: 'Delete canceled'
-          })
+    handleDelete(key) {
+      this.$confirm('You are about to delete selected Customers. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        customerResource.destroy(this.list[key].client_id)
+        this.getList()
+        this.$message({
+          type: 'success',
+          message: 'Delete completed'
         })
-      }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled'
+        })
+      })
     },
     onFileChange(file) {
       console.log(file)
