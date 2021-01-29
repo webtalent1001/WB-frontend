@@ -114,13 +114,13 @@
           <el-form-item :label="$t('contactPerson.address2')" prop="address2">
             <el-input v-model="currentRecord.address2" />
           </el-form-item>
-          <el-form-item :label="$t('contactPerson.city')" prop="city">
-            <el-input v-model="currentRecord.city" />
-          </el-form-item>
           <el-form-item :label="$t('contactPerson.state')" prop="state">
             <el-select v-model="currentRecord.state" class="filter-item" :placeholder="$t('common.selectLabel') + $t('contactPerson.state')">
               <el-option v-for="item in relations.states" :key="item.state_id" :label="item.abbr | uppercaseFirst" :value="item.state_id" />
             </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('contactPerson.city')" prop="city">
+            <el-input v-model="currentRecord.city" />
           </el-form-item>
           <el-form-item :label="$t('contactPerson.zip')" prop="zip">
             <el-input v-model="currentRecord.zip" />
