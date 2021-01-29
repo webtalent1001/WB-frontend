@@ -18,13 +18,13 @@ const customerRoutes = {
       component: () => import('@/views/customer/archive'),
       name: 'CustomerList',
       meta: { title: 'Customers', icon: 'user', permissions: ['manage customer'] }
+    },
+    {
+      path: 'contact_persons',
+      component: () => import('@/views/contact-person/archive'),
+      name: 'ContactPersonList',
+      meta: { title: 'Person', icon: 'user', permissions: ['manage customer'] }
     }
-    // {
-    //   path: 'contact_persons',
-    //   component: () => import('@/views/contact-person/archive'),
-    //   name: 'ContactPersonList',
-    //   meta: { title: 'Person', icon: 'user', permissions: ['manage customer'] }
-    // }
   ]
 }
 

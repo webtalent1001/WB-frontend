@@ -3,7 +3,7 @@ import Resource from '@/api/resource'
 
 class WBOrderResource extends Resource {
   constructor() {
-    super('wborder')
+    super('orders')
   }
 
   getFormInitial() {

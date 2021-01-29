@@ -27,9 +27,7 @@
       <el-table
         ref="mainTbl"
         v-loading="loading"
-        show-summary
         :data="list"
-        :summary-method="getMainTblSummaries"
         border
         fit
         highlight-current-row
@@ -307,6 +305,50 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-row>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>TBP:</p>
+            <p class="value">{{ totalStat.tbp }}</p>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>Discount:</p>
+            <p class="value">{{ totalStat.discount }}</p>
+          </div>
+        </el-col>
+        <el-col :span="4">
+          <div class="footer-cell">
+            <p class='label'>Extra Discount:</p>
+            <p class="value">{{ totalStat.eDiscount }}</p>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>Sub:</p>
+            <p class="value">{{ totalStat.extended }}</p>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>PR-Vaule:</p>
+            <p class="value">{{ totalStat.promotion }}</p>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>ETax:</p>
+            <p class="value">{{ totalStat.tax }}</p>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <div class="footer-cell">
+            <p class='label'>Total Due:</p>
+            <p class="value">{{ totalStat.total }}</p>
+          </div>
+        </el-col>
+      </el-row>
       <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="fnLoadData" />
     </div>
   </div>
@@ -356,6 +398,15 @@ export default {
         page: 1,
         limit: 10,
         keyword: ''
+      },
+      totalStat:{
+        tbp: 0,
+        discount: 0,
+        eDiscount: 0,
+        promotion: 0,
+        extended: 0,
+        tax: 0,
+        total: 0,
       }
     }
   },
@@ -387,58 +438,7 @@ export default {
         loading.close()
       }
     },
-    getMainTblSummaries(param) {
-      const { columns, data } = param
-      const sums = []
-      columns.forEach((column, index) => {
-        if (index < 4) {
-          sums[index] = ''
-          return
-        }
-        const values = data.map(item => Number(item[column.property]))
-        if (!values.every(value => isNaN(value))) {
-          let prefix = ''
-          switch (index) {
-            case 5:
-              prefix = 'TBP:'
-              break
-            case 6:
-              prefix = 'Discount:'
-              break
-            case 7:
-              prefix = 'Extra Discount:'
-              break
-            case 8:
-              prefix = 'Sub:'
-              break
-            case 9:
-              prefix = 'PR-Value:'
-              break
-            case 10:
-              prefix = 'ETax:'
-              break
-            case 11:
-              prefix = 'Total Due:'
-              break
-            case 12:
-              prefix = 'Total Debt:'
-              break
-          }
-          sums[index] = prefix + '$' + values.reduce((prev, curr) => {
-            const value = Number(curr)
-            if (!isNaN(value)) {
-              return prev + curr
-            } else {
-              return prev
-            }
-          }, 0).toFixed(2)
-        } else {
-          sums[index] = ''
-        }
-      })
-
-      return sums
-    },
+    
     handleDateChange() {
       this.fnLoadData()
     },
@@ -455,7 +455,7 @@ export default {
       const { limit, page } = this.query
       query.start_date = this.value2[0]
       query.end_date = this.value2[1]
-      const { orders, total } = await wbOrderResource.archive0(query)
+      const { orders, total, total_stat } = await wbOrderResource.archive0(query)
       this.list = orders
       this.total = total
       this.list.forEach((element, index) => {
@@ -463,6 +463,7 @@ export default {
         this.list[index]['index'] = (page - 1) * limit + index + 1
         this.list[index]['key'] = index
       })
+      this.totalStat = total_stat
       this.loading = false
     }
   }
@@ -481,5 +482,14 @@ export default {
     color: #8492a6;
     font-size: 14px;
     margin-bottom: 20px;
+  }
+  
+  .footer-cell {
+    display: flex;
+    padding:10px 10px 10px 0px;
+    font-size: 18px;
+  }
+  .footer-cell > .value{
+    color: green;
   }
 </style>
