@@ -27,7 +27,7 @@ const orderRoutes = {
     {
       path: 'archive1',
       component: () => import('@/views/orders/archive1'),
-      name: 'OrderPending',
+      name: 'OrderFulfillment',
       meta: { title: 'Walnut Fulfillment', icon: 'el-icon-folder-opened', permissions: ['manage_order_pending'] }
     },
     {

@@ -90,19 +90,19 @@
             </el-col>
           </el-row>
           <el-row :gutter="10">
-            <el-col :sm="8" :xs="24">
+            <el-col :md="8" :sm="12" :xs="24">
               <el-form-item :label="$t('order.form.row.qty')" prop="qty">
-                <el-input-number v-model="currentRow.qty" controls-position="right" :min="1" :inline-message="$t('order.form.row.qty')" @change="handleInventoryChange" />
+                <el-input v-model="currentRow.qty" controls-position="right" :min="1" :inline-message="$t('order.form.row.qty')" @change="handleInventoryChange" />
               </el-form-item>
             </el-col>
-            <el-col :sm="8" :xs="24">
+            <el-col :md="8" :sm="12" :xs="24">
               <el-form-item :label="$t('order.form.row.unit')">
                 <el-input v-model="currentRow.units" :readonly="true" />
               </el-form-item>
             </el-col>
-            <el-col :sm="8" :xs="24">
+            <el-col :md="8" :sm="12" :xs="24">
               <el-form-item :label="$t('order.form.row.basePrice')" prop="unit_price">
-                <el-input-number v-model="currentRow.unit_price" :min="0" controls-position="right" @change="handleUnitPriceChange" />
+                <el-input v-model="currentRow.unit_price" :min="0" controls-position="right" @change="handleUnitPriceChange" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -145,7 +145,7 @@
           <el-row :gutter="10">
             <el-col :sm="8" :xs="24">
               <el-form-item :label="$t('order.form.row.tax')">
-                <el-input-number v-model="currentRow.tax" controls-position="right" :disabled="currentRow.bTax" @change="handleUnitPriceChange" />
+                <el-input v-model="currentRow.tax" controls-position="right" :disabled="currentRow.bTax" @change="handleUnitPriceChange" />
               </el-form-item>
             </el-col>
             <el-col :sm="8" :xs="24">
@@ -442,9 +442,9 @@ export default {
                 type: 'info',
                 center: true
               }).then(() => {
-                console.log('pending order')
+                this.$router.push('/orders/archive0')
               }).catch((e) => {
-                console.log('new order')
+                location.reload()
               })
             }).catch((e) => {
               loading.close()
@@ -592,8 +592,8 @@ export default {
       this.termLabel = ''
       this.currentRecord.term_id = 0
       this.initialData.contactPersons.forEach(element => {
-        if (element.contact_id === currentCustomer.salesrep) {
-          this.currentRecord.salesperson_id = currentCustomer.salesrep
+        if (element.contact_id === currentCustomer.accountmanager) {
+          this.currentRecord.salesperson_id = currentCustomer.accountmanager
           this.termLabel = currentCustomer.rTerm.name
           this.currentRecord.term_id = currentCustomer.rTerm.id
         }
