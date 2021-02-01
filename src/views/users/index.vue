@@ -11,7 +11,7 @@
     <el-table :data="list" v-loading="loading" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="ID" width="220">
         <template slot-scope="scope">
-          {{ scope.row.id }}
+          {{ scope.row.key + 1 }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Name" width="220">
