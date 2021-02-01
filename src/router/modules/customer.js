@@ -7,6 +7,7 @@ const customerRoutes = {
   redirect: '/customer/customers',
   name: 'Customer Relations',
   alwaysShow: true,
+  hidden: true,
   meta: {
     title: 'Customer Relations',
     icon: 'peoples',
