@@ -93,6 +93,7 @@
 </template>
 <script>
 import WBOrderResource from '@/api/wborder'
+import { parseTime } from '@/utils';
 import { defaultRage } from '@/utils/datemanage'
 import Pagination from '@/components/Pagination'
 const wbOrderResource = new WBOrderResource()
